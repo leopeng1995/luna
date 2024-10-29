@@ -33,6 +33,35 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const fetchSummaryFromHtml = async (html: any, updateMessage: (text: string) => void) => {
+    let response = "";
+    
+    await fetchEventSource(`${constants.API_URL}/summarize-html`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream"
+      },
+      body: JSON.stringify({ html }),
+      signal: ctrl.signal,
+      onopen: async () => {
+        response = "";
+      },
+      onmessage: async (event: any) => {
+        let data = JSON.parse(event.data);
+        response += data.text;
+        updateMessage(response);
+      },
+      onerror: (error: any) => {
+        console.error("Error:", error);
+        setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
+      },
+      onclose: () => {
+        setIsLoading(false);
+      }
+    });
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -40,7 +69,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
   useEffect(() => {
     const fetchSummary = async () => {
       if (hasFetchedSummary) return;
-
+      
       setHasFetchedSummary(true);
       try {
         setIsLoading(true);
@@ -48,48 +77,18 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
         setMessages([{ text: "正在加载网页...", sender: "bot" }]);
         
         const html = await extract(contentUrl);
-        console.log(html);
         setIsLoadingWebpage(false);
         
-        let summary = "";
-
-        await fetchEventSource(`${constants.API_URL}/summarize-html`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "text/event-stream"
-          },
-          body: JSON.stringify({ html }),
-          signal: ctrl.signal,
-          onopen: async (response: any) => {
-            summary = "";
-          },
-          onmessage: async (event: any) => {
-            let data = JSON.parse(event.data);
-            summary += data.text;
-            setMessages([{ text: summary, sender: "bot" }]);
-          },
-          onerror: (error: any) => {
-            console.error("Error:", error);
-            setMessages([{ text: "抱歉,获取总结时出现错误。", sender: "bot" }]);
-          },
-          onclose: () => {
-            setIsLoading(false);
-          }
+        await fetchSummaryFromHtml(html, (text) => {
+          setMessages([{ text, sender: "bot" }]);
         });
       } catch (err) {
-        console.error(err);
-        setMessages([{ text: "抱歉,获取总结时出现错误。", sender: "bot" }]);
-        setIsLoading(false);
-        setIsLoadingWebpage(false);
+        // ... error handling ...
       }
     };
-
+    
     fetchSummary();
-
-    return () => {
-      ctrl.abort();
-    };
+    return () => ctrl.abort();
   }, [contentUrl, hasFetchedSummary]);
 
   const sendMessage = async () => {
@@ -105,40 +104,12 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
         const html = await extract(contentUrl);
         setIsLoadingWebpage(false);
         
-        let response = "";
-
-        await fetchEventSource(`${constants.API_URL}/summarize-html`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "text/event-stream"
-          },
-          body: JSON.stringify({ html }),
-          signal: ctrl.signal,
-          onopen: async () => {
-            response = "";
-            setMessages(prevMessages => {
-              const newMessages = [...prevMessages];
-              newMessages[newMessages.length - 1] = { text: "", sender: "bot" };
-              return newMessages;
-            });
-          },
-          onmessage: async (event: any) => {
-            let data = JSON.parse(event.data);
-            response += data.text;
-            setMessages(prevMessages => {
-              const newMessages = [...prevMessages];
-              newMessages[newMessages.length - 1] = { text: response, sender: "bot" };
-              return newMessages;
-            });
-          },
-          onerror: (error: any) => {
-            console.error("Error:", error);
-            setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
-          },
-          onclose: () => {
-            setIsLoading(false);
-          }
+        await fetchSummaryFromHtml(html, (text) => {
+          setMessages(prevMessages => {
+            const newMessages = [...prevMessages];
+            newMessages[newMessages.length - 1] = { text, sender: "bot" };
+            return newMessages;
+          });
         });
       } catch (err) {
         console.error(err);

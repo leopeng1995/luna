@@ -42,7 +42,6 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
   };
 
   const translateText = (text: string, sourceLang: string, targetLang: string, currentApiKey: string = apiKey) => {
-    console.log("currentApiKey:", currentApiKey);
     if (!currentApiKey) {
       setTargetContent("错误：请先设置 API Key");
       return;
