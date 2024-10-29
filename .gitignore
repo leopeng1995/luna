@@ -1,0 +1,14 @@
+npm-debug.log
+.DS_Store
+
+dist.crx
+dist.pem
+dist.zip
+
+node_modules/
+dist/
+tmp/
+.vscode/
+
+pnpm-lock.yaml
+yarn.lock
