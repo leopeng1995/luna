@@ -8,8 +8,6 @@ import { extract } from '@extractus/article-extractor';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import ReactMarkdown from 'react-markdown';
 
-import constants from "../constants";
-
 type Message = {
   text: string;
   sender: "user" | "bot";
@@ -26,6 +24,8 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
   const [isLoadingWebpage, setIsLoadingWebpage] = useState(false);
   const [hasFetchedSummary, setHasFetchedSummary] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [apiKey, setApiKey] = useState<string>("");
+  const [error, setError] = useState<string>("");
 
   const ctrl = new AbortController();
 
@@ -33,33 +33,63 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const fetchSummaryFromHtml = async (html: any, updateMessage: (text: string) => void) => {
+  const fetchSummaryFromHtml = async (html: any, apiKey: string, updateMessage: (text: string) => void) => {
     let response = "";
     
-    await fetchEventSource(`${constants.API_URL}/summarize-html`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "text/event-stream"
-      },
-      body: JSON.stringify({ html }),
-      signal: ctrl.signal,
-      onopen: async () => {
-        response = "";
-      },
-      onmessage: async (event: any) => {
-        let data = JSON.parse(event.data);
-        response += data.text;
-        updateMessage(response);
-      },
-      onerror: (error: any) => {
-        console.error("Error:", error);
-        setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
-      },
-      onclose: () => {
+    try {
+      if (!apiKey) {
+        console.error("API Key 未设置");
+        updateMessage("错误：请先设置 API Key");
         setIsLoading(false);
+        return;
       }
-    });
+
+      await fetchEventSource('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "glm-4-air",
+          stream: true,
+          messages: [
+            {
+              role: "system",
+              content: "You are a helpful assistant."
+            },
+            {
+              role: "user",
+              content: `[网页内容]\n${html.content}\n[任务]\n请你总结网页内容`
+            }
+          ]
+        }),
+        signal: ctrl.signal,
+        onopen: async () => {
+          response = "";
+        },
+        onmessage: async (event: any) => {
+          let data = event.data;
+          if (data === "[DONE]") return;
+  
+          let json = JSON.parse(data);
+          const content = json.choices?.[0]?.delta?.content || '';
+          response += content;
+          updateMessage(response);
+        },
+        onerror: (error: any) => {
+          console.error("Error:", error);
+          setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
+        },
+        onclose: () => {
+          setIsLoading(false);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -67,7 +97,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
   }, [messages]);
 
   useEffect(() => {
-    const fetchSummary = async () => {
+    const fetchSummary = async (currentApiKey: string = apiKey) => {
       if (hasFetchedSummary) return;
       
       setHasFetchedSummary(true);
@@ -79,15 +109,22 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
         const html = await extract(contentUrl);
         setIsLoadingWebpage(false);
         
-        await fetchSummaryFromHtml(html, (text) => {
+        await fetchSummaryFromHtml(html, currentApiKey, (text) => {
           setMessages([{ text, sender: "bot" }]);
         });
       } catch (err) {
-        // ... error handling ...
+        // TODO: error handling
       }
     };
+
+    chrome.storage.local.get(["apiKey"], function (result) {
+      setApiKey(result.apiKey || "");
+      console.log("获取到的 apiKey:", result.apiKey);
+      if (result.apiKey) {
+        fetchSummary(result.apiKey);
+      }
+    });
     
-    fetchSummary();
     return () => ctrl.abort();
   }, [contentUrl, hasFetchedSummary]);
 
@@ -104,7 +141,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
         const html = await extract(contentUrl);
         setIsLoadingWebpage(false);
         
-        await fetchSummaryFromHtml(html, (text) => {
+        await fetchSummaryFromHtml(html, apiKey, (text) => {
           setMessages(prevMessages => {
             const newMessages = [...prevMessages];
             newMessages[newMessages.length - 1] = { text, sender: "bot" };
