@@ -45,7 +45,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
       try {
         setIsLoading(true);
         setIsLoadingWebpage(true);
-        setMessages([{ text: "正在加载网页...", sender: "bot" }]);
+        setMessages([{ text: "Loading webpage...", sender: "bot" }]);
         
         const html = await extract(contentUrl);
         console.log(html);
@@ -71,7 +71,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
           },
           onerror: (error: any) => {
             console.error("Error:", error);
-            setMessages([{ text: "抱歉,获取总结时出现错误。", sender: "bot" }]);
+            setMessages([{ text: "Sorry, an error occurred while getting the summary.", sender: "bot" }]);
           },
           onclose: () => {
             setIsLoading(false);
@@ -79,7 +79,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
         });
       } catch (err) {
         console.error(err);
-        setMessages([{ text: "抱歉,获取总结时出现错误。", sender: "bot" }]);
+        setMessages([{ text: "Sorry, an error occurred while getting the summary.", sender: "bot" }]);
         setIsLoading(false);
         setIsLoadingWebpage(false);
       }
@@ -101,7 +101,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
       setIsLoadingWebpage(true);
 
       try {
-        setMessages(prevMessages => [...prevMessages, { text: "正在加载网页...", sender: "bot" }]);
+        setMessages(prevMessages => [...prevMessages, { text: "Loading webpage...", sender: "bot" }]);
         const html = await extract(contentUrl);
         setIsLoadingWebpage(false);
         
@@ -134,7 +134,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
           },
           onerror: (error: any) => {
             console.error("Error:", error);
-            setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
+            setMessages(prevMessages => [...prevMessages, { text: "Sorry, an error occurred. Please try again later.", sender: "bot" }]);
           },
           onclose: () => {
             setIsLoading(false);
@@ -142,7 +142,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
         });
       } catch (err) {
         console.error(err);
-        setMessages(prevMessages => [...prevMessages, { text: "抱歉,发生错误。请稍后再试。", sender: "bot" }]);
+        setMessages(prevMessages => [...prevMessages, { text: "Sorry, an error occurred. Please try again later.", sender: "bot" }]);
         setIsLoading(false);
         setIsLoadingWebpage(false);
       }
@@ -214,7 +214,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
             }}
             sx={{ flexGrow: 1, marginRight: 1 }}
             size="small"
-            label="输入消息"
+            label="Enter message"
             variant="outlined"
             disabled={isLoading}
           />
@@ -225,7 +225,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ contentUrl }) => {
             onClick={sendMessage}
             disabled={isLoading}
           >
-            发送
+            Send
           </Button>
         </Box>
       </Box>

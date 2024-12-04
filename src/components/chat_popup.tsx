@@ -87,8 +87,8 @@ const ChatPopup: React.FC<ChatPopupProps> = memo(({ contentUrl, onClose }) => {
         display: "flex"
       }}>
         <Tabs sx={{ flexGrow: 1 }} value={value} onChange={handleChange}>
-          <Tab label="网页对话" {...a11yProps(0)} />
-          <Tab label="脑图总结" {...a11yProps(1)} />
+          <Tab label="Chat with Page" {...a11yProps(0)} />
+          <Tab label="Mindmap Summary" {...a11yProps(1)} />
         </Tabs>
         <CloseIcon onClick={onClose} sx={{ width: 20, marginRight: theme.spacing(1.25) }} />
       </Box>

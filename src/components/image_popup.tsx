@@ -89,7 +89,7 @@ const ImagePopup = ({
 
   const postData = async (currentApiKey: string = apiKey) => {
     if (!currentApiKey) {
-      setFetchData("错误：请先设置 API Key");
+      setFetchData("Error: Please set API Key first");
       setIsLoading(false);
       return;
     }
@@ -124,7 +124,7 @@ const ImagePopup = ({
                 },
                 {
                   type: "text",
-                  text: "请描述这张图片"
+                  text: "Please describe this image"
                 }
               ]
             }
@@ -144,7 +144,7 @@ const ImagePopup = ({
         },
         onerror: (error: any) => {
           console.error("Error:", error);
-          setFetchData("抱歉，获取图片描述时出现错误。");
+          setFetchData("Sorry, an error occurred while getting the image description.");
           setHasError(true);
           setIsLoading(false);
         },
@@ -154,7 +154,7 @@ const ImagePopup = ({
       });
     } catch (error) {
       console.error("Error:", error);
-      setFetchData("抱歉，获取图片描述时出现错误。");
+      setFetchData("Sorry, an error occurred while getting the image description.");
       setHasError(true);
       setIsLoading(false);
     }
@@ -237,7 +237,7 @@ const ImagePopup = ({
           rows={10}
           value={fetchData}
           variant="outlined"
-          label="图片描述"
+          label="Image Description"
           slotProps={{
             input: {
               readOnly: true,
@@ -250,7 +250,7 @@ const ImagePopup = ({
             onClick={handleCopyClick}
             size="small"
           >
-            复制
+            Copy
           </Button>
         </Box>
         {isLoading && !hasError && (
@@ -269,14 +269,14 @@ const ImagePopup = ({
           onClick={onClose}
           size="small"
         >
-          关闭
+          Close
         </Button>
       </CardActions>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
-        message="已复制到剪贴板"
+        message="Copied to clipboard"
       />
     </Card>
   );

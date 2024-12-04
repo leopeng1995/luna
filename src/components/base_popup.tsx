@@ -137,13 +137,6 @@ const BasePopup: React.FC<BasePopupProps> = ({
               <TranslateIcon />
             </Button>
             <Button 
-              onClick={() => setActiveTab('explain')}
-              variant={activeTab === 'explain' ? 'contained' : 'outlined'}
-              title="Code Explanation"
-            >
-              <CodeIcon />
-            </Button>
-            <Button 
               onClick={() => setActiveTab('write')}
               variant={activeTab === 'write' ? 'contained' : 'outlined'}
               title="Write"
@@ -156,6 +149,13 @@ const BasePopup: React.FC<BasePopupProps> = ({
               title="Rewrite"
             >
               <AutoFixHighIcon />
+            </Button>
+            <Button 
+              onClick={() => setActiveTab('explain')}
+              variant={activeTab === 'explain' ? 'contained' : 'outlined'}
+              title="Code Explanation"
+            >
+              <CodeIcon />
             </Button>
           </ButtonGroup>
         </Box>

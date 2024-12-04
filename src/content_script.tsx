@@ -3,9 +3,10 @@ import { createRoot, Root } from "react-dom/client";
 
 import { TranslatePopup, ImagePopup, ChatPopup } from "./components";
 
-let root: Root | null = null; // 声明一个全局的 root 变量
+// Declare a global root variable
+let root: Root | null = null;
 
-// 创建通用的弹窗容器工具函数
+// Create a utility function for generic popup container
 const createPopupContainer = () => {
   const container = document.createElement("div");
   container.style.position = 'fixed';
@@ -39,16 +40,15 @@ const ThumbIcon = ({ text, x, y }: { text: string; x: number; y: number }) => {
     boxShadow: "0 0 4px rgba(0,0,0,0.2)",
     cursor: "pointer",
     userSelect: "none",
-    zIndex: "99999",   // 添加较高的 z-index 确保图标在最上层
+    zIndex: "99999",   // Add high z-index to ensure icon stays on top
   };
 
   const imgStyle: CSSProperties = {
     display: "block",
     width: "100%",
     height: "100%",
-    cursor: 'pointer',  // 给图片也添加 cursor: pointer
+    cursor: 'pointer',  // Give image cursor: pointer
   };
-
 
   const handleClick = () => {
     if (!popupState.visible) {
@@ -83,7 +83,7 @@ const ThumbIcon = ({ text, x, y }: { text: string; x: number; y: number }) => {
       style={iconStyle}
       title={text}
       onClick={handleClick}
-      onMouseOver={(e) => { e.currentTarget.style.cursor = 'pointer' }}  // 添加鼠标悬停事件
+      onMouseOver={(e) => { e.currentTarget.style.cursor = 'pointer' }}  // Add mouse hover event
     >
       <img
         src="https://dss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/topnav/newxueshuicon-a5314d5c83.png"
@@ -94,7 +94,7 @@ const ThumbIcon = ({ text, x, y }: { text: string; x: number; y: number }) => {
   );
 };
 
-// 优化选择文本处理函数
+// Optimize text selection handling function
 const handleSelectionChange = (event: MouseEvent) => {
   const SELECTION_DELAY = 10;
 
@@ -128,7 +128,7 @@ const handleSelectionChange = (event: MouseEvent) => {
   }, SELECTION_DELAY);
 };
 
-// 提取清理函数
+// Extract cleanup function
 const cleanupThumbIcon = () => {
   const thumbIcon = document.getElementById("thumb-icon");
   if (thumbIcon && root) {
@@ -138,7 +138,7 @@ const cleanupThumbIcon = () => {
   }
 };
 
-// 优化消息处理
+// Optimize message handling
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   try {
     const { container, root } = createPopupContainer();

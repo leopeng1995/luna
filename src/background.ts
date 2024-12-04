@@ -15,19 +15,19 @@ chrome.runtime.onInstalled.addListener(() => {
 
   chrome.contextMenus.create({
     id: "translateText",
-    title: "翻译选中文字",
+    title: "Translate Selected Text",
     contexts: ["selection"],
   });
 
   chrome.contextMenus.create({
     id: "chatPage",
-    title: "网页对话",
+    title: "Chat with Page",
     contexts: ["page"],
   });
 
   chrome.contextMenus.create({
     id: "illustrateImage",
-    title: "图片理解",
+    title: "Understand Image",
     contexts: ["image"],
   });
 });
@@ -35,14 +35,14 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
   if (info.menuItemId === "illustrateImage") {
     if (tab && tab.id && info.srcUrl) {
-      // 获取图片的 base64 编码
+      // Get image base64 encoding
       fetch(info.srcUrl)
         .then(response => response.blob())
         .then(blob => {
           const reader = new FileReader();
           reader.onloadend = function() {
             const base64data = reader.result as string;
-            // 发送 base64 数据到 content script
+            // Send base64 data to content script
             chrome.tabs.sendMessage(tab.id!, {
               action: "illustrateImage",
               imageBase64: base64data,

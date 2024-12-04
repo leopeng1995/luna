@@ -34,7 +34,7 @@ interface TranslateContentProps {
   initialContent: string;
 }
 
-// 添加语言代码映射函数
+// Add language code mapping function
 const mapUILangToAPILang = (uiLang: string): string => {
   const langMap: { [key: string]: string } = {
     'zh-Hans': 'zh'
@@ -51,7 +51,7 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
   const [translator, setTranslator] = useState<any>(null);
 
   useEffect(() => {
-    // 只有当前是翻译标签时才初始化翻译器
+    // Only initialize the translator when the current tab is the translate tab
     if (activeTab === 'translate' && sourceContent) {
       initTranslator(src_lang, tgt_lang).then(() => {
         translateText(sourceContent);
@@ -61,8 +61,8 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
 
   const initTranslator = async (sourceLang: string, targetLang: string) => {
     if (!window.translation) {
-      console.error("window.translation 未定义");
-      setTargetContent("错误：翻译服务未初始化");
+      console.error("window.translation is not defined");
+      setTargetContent("Error: Translation service not initialized");
       return false;
     }
 
@@ -76,17 +76,17 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
       if (canTranslate !== 'no') {
         const newTranslator = await window.translation.createTranslator(languagePair);
         if (!newTranslator) {
-          setTargetContent("错误：创建翻译器失败");
+          setTargetContent("Error: Failed to create translator");
           return false;
         }
         setTranslator(newTranslator);
         return true;
       } else {
-        setTargetContent("错误：当前语言对不支持翻译");
+        setTargetContent("Error: Current language pair is not supported");
         return false;
       }
     } catch (error) {
-      console.error("初始化翻译器失败:", error);
+      console.error("Failed to initialize translator:", error);
       setTargetContent(`Error: ${error}`);
       return false;
     }
@@ -104,22 +104,22 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
 
     setTargetContent("loading...");
     try {
-      // 确保每次翻译时都重新初始化翻译器
+      // Ensure the translator is reinitialized each time translation is performed
       const newTranslator = await window.translation.createTranslator({
         sourceLanguage: mapUILangToAPILang(src_lang),
         targetLanguage: mapUILangToAPILang(tgt_lang),
       });
       
       if (!newTranslator) {
-        setTargetContent("错误：创建翻译器失败");
+        setTargetContent("Error: Failed to create translator");
         return;
       }
 
       const translation = await newTranslator.translate(text);
       setTargetContent(translation);
     } catch (error) {
-      console.error("翻译失败:", error);
-      setTargetContent(`翻译失败: ${error}`);
+      console.error("Translation failed:", error);
+      setTargetContent(`Translation failed: ${error}`);
     }
   };
 
@@ -130,7 +130,7 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
     setTgtLang(newTgtLang);
     setSourceContent(targetContent);
     
-    // 重新初始化翻译器并翻译
+    // Reinitialize the translator and translate
     await initTranslator(newSrcLang, newTgtLang);
     translateText(targetContent);
   };
@@ -155,12 +155,12 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
       setTgtLang(value);
     }
     
-    // 重新初始化翻译器
+    // Reinitialize the translator
     await initTranslator(
       type === 'source' ? value : src_lang,
       type === 'target' ? value : tgt_lang
     );
-    // 如果有源文本，则立即翻译
+    // If there is source text, translate immediately
     if (sourceContent) {
       translateText(sourceContent);
     }
@@ -172,28 +172,28 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
     <Box sx={{ fontSize: '14px', '& *': { fontSize: 'inherit' } }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
         <FormControl sx={{ width: '45%' }}>
-          <InputLabel>源语言</InputLabel>
+          <InputLabel>Source Language</InputLabel>
           <Select
             value={src_lang}
             onChange={(e) => handleLanguageChange('source', e.target.value as string)}
-            label="源语言"
+            label="Source Language"
           >
-            <MenuItem value="en">英语</MenuItem>
-            <MenuItem value="zh-Hans">中文</MenuItem>
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="zh-Hans">Chinese</MenuItem>
           </Select>
         </FormControl>
         <IconButton onClick={swapLanguages}>
           <SwapHorizIcon />
         </IconButton>
         <FormControl sx={{ width: '45%' }}>
-          <InputLabel>目标语言</InputLabel>
+          <InputLabel>Target Language</InputLabel>
           <Select
             value={tgt_lang}
             onChange={(e) => handleLanguageChange('target', e.target.value as string)}
-            label="目标语言"
+            label="Target Language"
           >
-            <MenuItem value="en">英语</MenuItem>
-            <MenuItem value="zh-Hans">中文</MenuItem>
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="zh-Hans">Chinese</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -204,10 +204,10 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
         value={sourceContent}
         onChange={handleSourceContentChange}
         variant="outlined"
-        label="源文本"
+        label="Source Text"
         sx={{ marginBottom: 2 }}
       />
-      <Box sx={{ marginBottom: 2, fontWeight: 'bold', textAlign: 'center' }}>翻译结果</Box>
+      <Box sx={{ marginBottom: 2, fontWeight: 'bold', textAlign: 'center' }}>Translation Result</Box>
       <Box sx={{
         minHeight: '100px',
         maxHeight: '200px',
@@ -225,21 +225,21 @@ const TranslateContent: React.FC<TranslateContentProps> = ({ activeTab, initialC
           variant="contained"
           color="primary"
         >
-          翻译
+          Translate
         </Button>
         <Button
           startIcon={<ContentCopyIcon />}
           onClick={handleCopyClick}
           size="small"
         >
-          复制
+          Copy
         </Button>
       </Box>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
-        message="已复制到剪贴板"
+        message="Copied to clipboard"
       />
     </Box>
   );

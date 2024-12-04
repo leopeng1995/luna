@@ -38,18 +38,18 @@ const Popup = () => {
       <Paper elevation={3} sx={{ p: 3, mt: 2 }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Typography variant="h6" component="h1">
-            API Key 设置
+            API Key Settings
           </Typography>
           
           {savedApiKey && (
             <Typography variant="body2" color="text.secondary">
-              当前 API Key: {savedApiKey}
+              Current API Key: {savedApiKey}
             </Typography>
           )}
 
           <TextField
             fullWidth
-            label="输入 API Key"
+            label="Enter API Key"
             variant="outlined"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
@@ -60,7 +60,7 @@ const Popup = () => {
             onClick={saveApiKey}
             sx={{ mt: 1 }}
           >
-            保存 API Key
+            Save API Key
           </Button>
         </Box>
       </Paper>
