@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "strict": true,
-        "target": "es6",
+        "target": "ES2018",
         "moduleResolution": "bundler",
         "module": "ES6",
         "esModuleInterop": true,
@@ -13,6 +13,11 @@
         "typeRoots": [ "node_modules/@types" ],
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ]
     },
     "include": ["src/**/*"]
 }

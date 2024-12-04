@@ -11,24 +11,6 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Snackbar from '@mui/material/Snackbar';
 import Button from "@mui/material/Button";
 
-declare global {
-  interface Window {
-    translation: {
-      canTranslate: (options: {
-        sourceLanguage: string;
-        targetLanguage: string;
-      }) => Promise<string>;
-      createTranslator: (options: {
-        sourceLanguage: string;
-        targetLanguage: string;
-      }) => Promise<{
-        translate: (text: string) => Promise<string>;
-      }>;
-    };
-  }
-  const translation: Window['translation'];
-}
-
 interface TranslateContentProps {
   activeTab: string;
   initialContent: string;

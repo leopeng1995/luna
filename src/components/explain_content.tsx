@@ -6,21 +6,6 @@ import Snackbar from '@mui/material/Snackbar';
 import Button from "@mui/material/Button";
 import Alert from '@mui/material/Alert';
 
-declare global {
-  interface Window {
-    ai: {
-      languageModel: {
-        capabilities: () => Promise<{
-          available: string;
-          defaultTemperature: number;
-          defaultTopK: number;
-        }>;
-        create: (options?: any) => Promise<any>;
-      };
-    };
-  }
-}
-
 interface ExplainContentProps {
   activeTab: string;
   initialContent: string;
