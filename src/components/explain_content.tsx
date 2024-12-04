@@ -4,6 +4,22 @@ import Box from "@mui/material/Box";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import Snackbar from '@mui/material/Snackbar';
 import Button from "@mui/material/Button";
+import Alert from '@mui/material/Alert';
+
+declare global {
+  interface Window {
+    ai: {
+      languageModel: {
+        capabilities: () => Promise<{
+          available: string;
+          defaultTemperature: number;
+          defaultTopK: number;
+        }>;
+        create: (options?: any) => Promise<any>;
+      };
+    };
+  }
+}
 
 interface ExplainContentProps {
   activeTab: string;
@@ -14,6 +30,8 @@ const ExplainContent: React.FC<ExplainContentProps> = ({ activeTab, initialConte
   const [sourceContent, setSourceContent] = useState(initialContent);
   const [targetContent, setTargetContent] = useState("Explanation will appear here...");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isExplaining, setIsExplaining] = useState(false);
 
   useEffect(() => {
     if (activeTab === 'explain') {
@@ -25,10 +43,50 @@ const ExplainContent: React.FC<ExplainContentProps> = ({ activeTab, initialConte
     setSourceContent(event.target.value);
   };
 
-  const explainCode = (code: string) => {
+  const explainCode = async (code: string) => {
+    setIsExplaining(true);
+    setError(null);
     setTargetContent("Explaining code...");
-    // 这里添加代码解释的逻辑
-    // 可以使用类似 translateText 的方法，但调用不同的 API 端点
+
+    try {
+      // Check if AI model is available
+      const { available } = await window.ai.languageModel.capabilities();
+      
+      if (available === "no") {
+        throw new Error("AI model is not available");
+      }
+
+      // Create AI session
+      const session = await window.ai.languageModel.create({
+        systemPrompt: "You are a helpful programming assistant. Explain the following code in a clear and concise way, focusing on its main functionality and key components."
+      });
+
+      // Construct the prompt
+      const prompt = `Please explain this code:\n\n${code}`;
+
+      // Use streaming response to get explanation
+      let explanation = '';
+      let previousChunk = '';
+      
+      const stream = session.promptStreaming(prompt);
+      for await (const chunk of stream) {
+        const newChunk = chunk.startsWith(previousChunk)
+          ? chunk.slice(previousChunk.length)
+          : chunk;
+        explanation += newChunk;
+        setTargetContent(explanation);
+        previousChunk = chunk;
+      }
+
+      // Release session resources
+      session.destroy();
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to explain code");
+      setTargetContent("Failed to generate explanation.");
+    } finally {
+      setIsExplaining(false);
+    }
   };
 
   const handleCopyClick = () => {
@@ -55,7 +113,7 @@ const ExplainContent: React.FC<ExplainContentProps> = ({ activeTab, initialConte
         value={sourceContent}
         onChange={handleSourceContentChange}
         variant="outlined"
-        label="源代码"
+        label="Source Code"
         sx={{ marginBottom: 2 }}
       />
       <TextField
@@ -64,35 +122,41 @@ const ExplainContent: React.FC<ExplainContentProps> = ({ activeTab, initialConte
         rows={5}
         value={targetContent}
         variant="outlined"
-        label="解释结果"
+        label="Explanation"
         slotProps={{
           input: {
             readOnly: true,
           },
         }}
       />
+      {error && (
+        <Alert severity="error" sx={{ mt: 1 }}>
+          {error}
+        </Alert>
+      )}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 1 }}>
         <Button
           onClick={() => explainCode(sourceContent)}
           size="small"
           variant="contained"
           color="primary"
+          disabled={isExplaining}
         >
-          解释
+          {isExplaining ? 'Explaining...' : 'Explain'}
         </Button>
         <Button
           startIcon={<ContentCopyIcon />}
           onClick={handleCopyClick}
           size="small"
         >
-          复制
+          Copy
         </Button>
       </Box>
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={2000}
         onClose={handleSnackbarClose}
-        message="已复制到剪贴板"
+        message="Copied to clipboard"
       />
     </>
   );

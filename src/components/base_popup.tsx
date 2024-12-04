@@ -5,6 +5,10 @@ import Button from "@mui/material/Button";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import ButtonGroup from '@mui/material/ButtonGroup';
+import TranslateIcon from '@mui/icons-material/Translate';
+import CodeIcon from '@mui/icons-material/Code';
+import EditIcon from '@mui/icons-material/Edit';
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 
 interface BasePopupProps {
   content: string;
@@ -128,14 +132,30 @@ const BasePopup: React.FC<BasePopupProps> = ({
             <Button 
               onClick={() => setActiveTab('translate')}
               variant={activeTab === 'translate' ? 'contained' : 'outlined'}
+              title="Text Translation"
             >
-              文本翻译
+              <TranslateIcon />
             </Button>
             <Button 
               onClick={() => setActiveTab('explain')}
               variant={activeTab === 'explain' ? 'contained' : 'outlined'}
+              title="Code Explanation"
             >
-              代码解释
+              <CodeIcon />
+            </Button>
+            <Button 
+              onClick={() => setActiveTab('write')}
+              variant={activeTab === 'write' ? 'contained' : 'outlined'}
+              title="Write"
+            >
+              <EditIcon />
+            </Button>
+            <Button 
+              onClick={() => setActiveTab('rewrite')}
+              variant={activeTab === 'rewrite' ? 'contained' : 'outlined'}
+              title="Rewrite"
+            >
+              <AutoFixHighIcon />
             </Button>
           </ButtonGroup>
         </Box>
