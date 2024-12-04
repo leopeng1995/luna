@@ -26,6 +26,22 @@ declare global {
             destroy: () => void;
           }>;
         };
+        rewriter: {
+          create: (options?: {
+            sharedContext?: string;
+            signal?: AbortSignal;
+          }) => Promise<{
+            rewrite: (content: string, options?: {
+              context?: string;
+              signal?: AbortSignal;
+            }) => Promise<string>;
+            rewriteStreaming: (content: string, options?: {
+              context?: string;
+              signal?: AbortSignal;
+            }) => AsyncIterableIterator<string>;
+            destroy: () => void;
+          }>;
+        };
       };
       translation: {
         canTranslate: (options: {
@@ -41,7 +57,6 @@ declare global {
       };
     }
     const translation: Window['translation'];
-  }
+}
   
-  export {};
-  
+export {};

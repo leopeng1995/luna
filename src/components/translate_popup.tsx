@@ -3,6 +3,7 @@ import BasePopup from "./base_popup";
 import TranslateContent from "./translate_content";
 import ExplainContent from "./explain_content";
 import WriteContent from "./write_content";
+import RewriteContent from "./rewrite_content";
 
 interface TranslatePopupProps {
   content: string;
@@ -22,6 +23,7 @@ const TranslatePopup: React.FC<TranslatePopupProps> = ({
       <TranslateContent activeTab="translate" initialContent={content} />
       <ExplainContent activeTab="explain" initialContent={content} />
       <WriteContent activeTab="write" />
+      <RewriteContent activeTab="rewrite" initialContent={content} />
     </BasePopup>
   );
 };
