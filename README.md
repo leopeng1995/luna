@@ -1,15 +1,18 @@
 # Luna Assistant
 
-Chrome LLM Assistant Extension
+A Chrome extension leveraging Chrome's built-in AI capabilities (Gemini Nano) for enhanced browsing and content interaction.  This project was inspired by the [Google Chrome Built-in AI Challenge](https://googlechromeai.devpost.com/) and has transitioned its core functionality to utilize the power of on-device AI.
 
 ## Supported Features
 
-- Text Translation
-- Image Understanding 
-- WebPage Conversation
+- Text Translation (Translate API)
+- Write Content (Writer API)
+- Rewrite Content (Rewriter API)
+- Code Explanation (Prompt API)
+- WebPage Conversation (Summarization API, WIP)
 
 ## Roadmap
 
+- Image Understanding
 - Suggested Questions
 - MindMap
 - Voice Playback
