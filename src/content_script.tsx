@@ -86,7 +86,7 @@ const ThumbIcon = ({ text, x, y }: { text: string; x: number; y: number }) => {
       onMouseOver={(e) => { e.currentTarget.style.cursor = 'pointer' }}  // Add mouse hover event
     >
       <img
-        src="https://dss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/topnav/newxueshuicon-a5314d5c83.png"
+        src={chrome.runtime.getURL("icon.png")}
         alt="Thumb Icon"
         style={imgStyle}
       />
